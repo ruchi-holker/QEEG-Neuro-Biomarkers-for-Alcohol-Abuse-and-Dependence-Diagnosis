@@ -5,56 +5,7 @@ close all
 clear
 clc
 
-%% Constants
-fs = 256;   % Sampling frequency
-%NFFT = 512;
-bw = 10;
-low_freq =0;
-high_freq = 100;
 
-%% Filter bank demo
-fbank = filter_bank(NFFT, fs, bw, low_freq, high_freq, 'flat');
-plot((0:size(fbank,2)-1)/NFFT*fs, fbank.')
-xlabel('Frequency (Hz)')
-ylabel('Amplitude')
-
-%% Load AL Train
-path = '..\';
-AL_files = dir(fullfile(path, 'Training_Data', 'AL'));
-AL_files = AL_files(3:end);
-
-%% Load NA Train
-path = '..\';
-NA_files = dir(fullfile(path, 'Training_Data', 'NA'));
-NA_files = NA_files(3:end);
-
-%% data processing
-features = zeros(fix(NFFT/2)+1, 64, length(AL_files)+length(NA_files));
-labels = zeros(1, length(AL_files)+length(NA_files));
-% AL file processing
-for f = 1:length(AL_files)
-    fcount = fprintf(['Reading Train->AL file: ', num2str(f), '/', num2str(length(AL_files))]);
-    data = csvread(fullfile(path, 'Training_Data', 'AL', AL_files(f).name));
-%     data = resample(data, 25, 64);   % Resampling to 100 Hz (from paper)
-    X = abs(fft(data, NFFT, 1));
-    X = X(1:fix(NFFT/2)+1, :).^2;
-    
-    features(:, :, f) = X;
-    labels(f) = 1;
-    fprintf(repmat('\b', 1, fcount))
-end
-% NA file processing
-for f = 1:length(NA_files)
-    fcount = fprintf(['Reading Train->NA file: ', num2str(f), '/', num2str(length(NA_files))]);
-    data = csvread(fullfile(path, 'Training_Data', 'NA', NA_files(f).name));
-%     data = resample(data, 25, 64);   % Resampling to 100 Hz (from paper)
-    X = abs(fft(data, NFFT, 1));
-    X = X(1:fix(NFFT/2)+1, :).^2;
-    
-    features(:, :, f+length(AL_files)) = X;
-    labels(f+length(AL_files)) = 2;
-    fprintf(repmat('\b', 1, fcount))
-end
 
 %% RCSP with fetaures 
 %% RCSP
@@ -90,42 +41,6 @@ for p = 1:length(beta)
     csvwrite(['tr_park_comb_', num2str(beta(p)),'_', num2str(gamma(p)),'.csv'], [feat_vec.', labels.'])
 end 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Load AL Test
-path = '..\';
-AL_files = dir(fullfile(path, 'Test_Data', 'AL'));
-AL_files = AL_files(3:end);
-
-%% Load NA Test
-path = '..\';
-NA_files = dir(fullfile(path, 'Test_Data', 'NA'));
-NA_files = NA_files(3:end);
-
-%% data extraction
-features = zeros(fix(NFFT/2)+1, 64, length(AL_files)+length(NA_files));
-labels = zeros(1, length(AL_files)+length(NA_files));
-% AL file processing
-for f = 1:length(AL_files)
-    fcount = fprintf(['Reading Test->AL file: ', num2str(f), '/', num2str(length(AL_files))]);
-    data = csvread(fullfile(path, 'Test_Data', 'AL', AL_files(f).name));
-%     data = resample(data, 25, 64);   % Resampling to 100 Hz (from paper)
-    X = abs(fft(data, NFFT, 1));
-    X = X(1:fix(NFFT/2)+1, :).^2;
-    
-    features(:, :, f) = X;
-    labels(f) = 1;
-    fprintf(repmat('\b', 1, fcount))
-end
-% NA file processing
-for f = 1:length(NA_files)
-    fcount = fprintf(['Reading Test->NA file: ', num2str(f), '/', num2str(length(NA_files))]);
-    data = csvread(fullfile(path, 'Test_Data', 'NA', NA_files(f).name));
-    X = abs(fft(data, NFFT, 1));
-    X = X(1:fix(NFFT/2)+1, :).^2;
-    
-    features(:, :, f+length(AL_files)) = X;
-    labels(f+length(AL_files)) = 2;
-    fprintf(repmat('\b', 1, fcount))
-end
 
 %% RCSP
 fprintf('CSP processing started.\n')
