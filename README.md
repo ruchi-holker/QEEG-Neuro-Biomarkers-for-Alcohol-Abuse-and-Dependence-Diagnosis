@@ -1,5 +1,3 @@
-[![arXiv](https://img.shields.io/badge/arXiv-1704.05694%20-red)](https://arxiv.org/abs/1704.05694)
-
 If using this code, please cite our paper:
 Holker, Ruchi, and Seba Susan. "Leveraging QEEG neuro-biomarkers of alcohol-related visual cognitive impairment for alcohol abuse and dependence diagnosis." Applied Neuropsychology: Adult (2025): 1-12.
 https://www.tandfonline.com/doi/abs/10.1080/23279095.2025.2521360
